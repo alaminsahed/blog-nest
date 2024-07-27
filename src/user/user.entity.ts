@@ -1,5 +1,12 @@
 import { hash } from 'bcrypt';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ArticleEntity } from 'src/article/article.entity';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -8,6 +15,9 @@ export class UserEntity {
 
   @Column()
   email: string;
+
+  @Column({ default: '' })
+  username: string;
 
   @Column({ default: '' })
   bio: string;
@@ -19,7 +29,10 @@ export class UserEntity {
   password: string;
 
   @BeforeInsert()
-  async hasPassword() {
+  async hashPassword() {
     this.password = await hash(this.password, 10);
   }
+
+  @OneToMany(() => ArticleEntity, (article) => article.author)
+  articles: ArticleEntity[];
 }
